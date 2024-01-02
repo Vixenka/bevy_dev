@@ -3,6 +3,7 @@ name = "bevy_dev"
 version = "0.1.0"
 authors = ["Vixen <infvix@gmail.com>"]
 description = "Dev tools for Bevy Engine"
+keywords = ["prototype", "devtools", "textures", "assets"]
 categories = ["game-engines", "game-development", "tools", "prototype", "bevy"]
 readme = "README.md"
 repository = "https://github.com/Vixenka/bevy_dev"
