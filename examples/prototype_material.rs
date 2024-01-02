@@ -12,18 +12,18 @@ fn main() {
 }
 
 fn setup(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>) {
-    commands.spawn((PrototypeMaterialMeshBundle {
+    commands.spawn(PrototypeMaterialMeshBundle {
         mesh: meshes.add(shape::Box::new(50.0, 2.0, 50.0).into()),
         material: "floor",
         ..default()
-    },));
+    });
 
-    commands.spawn((PrototypeMaterialMeshBundle {
+    commands.spawn(PrototypeMaterialMeshBundle {
         transform: Transform::from_xyz(-1.0, 1.0, -0.5),
         mesh: meshes.add(shape::Box::new(4.0, 2.0, 1.0).into()),
         material: "wall",
         ..default()
-    },));
+    });
 
     commands.spawn(DirectionalLightBundle {
         directional_light: DirectionalLight {
