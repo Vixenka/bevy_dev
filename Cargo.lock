@@ -420,7 +420,6 @@ name = "bevy_dev"
 version = "0.1.0"
 dependencies = [
  "bevy",
- "bevy_embedded_assets",
  "random_color",
  "rust-embed",
  "uuid",
@@ -472,18 +471,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.46",
-]
-
-[[package]]
-name = "bevy_embedded_assets"
-version = "0.9.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dcbaa2716dd665f2197071268f5fd720bc23b0207894451f0a0912b3e80e86a1"
-dependencies = [
- "bevy",
- "cargo-emit",
- "futures-io",
- "futures-lite 2.1.0",
 ]
 
 [[package]]
@@ -1001,12 +988,6 @@ name = "byteorder"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1fd0f2584146f6f2ef48085050886acf353beff7305ebd1ae69500e27c67f64b"
-
-[[package]]
-name = "cargo-emit"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1582e1c9e755dd6ad6b224dcffb135d199399a4568d454bd89fe515ca8425695"
 
 [[package]]
 name = "cc"
