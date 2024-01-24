@@ -1,4 +1,7 @@
 # bevy_dev
+[![crates.io](https://img.shields.io/crates/v/bevy_dev)](https://crates.io/crates/bevy_dev)
+[![docs.rs](https://docs.rs/bevy_dev/badge.svg)](https://docs.rs/bevy_dev)
+
 Dev tools for [Bevy Engine](https://bevyengine.org/). For faster prototyping.
 
 ![Showcase](/images/prototype_material/showcase.webp)
@@ -32,7 +35,7 @@ commands.spawn(MaterialMeshBundle {
 });
 ```
 a solid red or any other color which mixing in eyes. Scene with colors like that it will quickly become unreadable, what you can see on the screenshot below:
- * ![Misleading textures](/images/prototype_material/misleading_textures.webp)
+![Misleading textures](/images/prototype_material/misleading_textures.webp)
 
 But with tool from this create you can archive better results just by change few chars:
 ```rust
