@@ -7,7 +7,7 @@ Dev tools for [Bevy Engine](https://bevyengine.org/). For faster prototyping.
 ![Showcase](/images/prototype_material/showcase.webp)
 
 ### Features
-- [x] [Prototype materials](#prototype-materials)
+- [x] [Prototype materials](#prototype-materials) - simple, metrically correct, PBR compatible and randomly painted mesh for better differentiation of prototype objects.
 
 ## Usage
 Add `DevPlugins` to Bevy's App.
