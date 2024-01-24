@@ -11,17 +11,21 @@ fn main() {
         .run();
 }
 
-fn setup(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>) {
-    commands.spawn(PrototypeMaterialMeshBundle {
+fn setup(
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+) {
+    commands.spawn(MaterialMeshBundle {
         mesh: meshes.add(shape::Box::new(50.0, 2.0, 50.0).into()),
-        material: "floor",
+        material: materials.add(Color::RED.into()),
         ..default()
     });
 
-    commands.spawn(PrototypeMaterialMeshBundle {
+    commands.spawn(MaterialMeshBundle {
         transform: Transform::from_xyz(-1.0, 1.0, -0.5),
         mesh: meshes.add(shape::Box::new(4.0, 2.0, 1.0).into()),
-        material: "wall",
+        material: materials.add(Color::BLUE.into()),
         ..default()
     });
 

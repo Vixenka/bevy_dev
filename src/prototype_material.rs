@@ -1,3 +1,31 @@
+/*!
+ * Simple, metrically correct, PBR compatible and randomly painted mesh for better differentiation of prototype objects.
+ *
+ * # Example
+ * In pure Bevy probably you will create a prototype floor like that:
+ * ```rust
+ * commands.spawn(MaterialMeshBundle {
+ *     mesh: meshes.add(shape::Box::new(50.0, 2.0, 50.0).into()),
+ *     material: materials.add(Color::RED.into()),
+ *     ..default()
+ * });
+ * ```
+ * a solid red or any other color which mixing in eyes. Scene with colors like that it will quickly become unreadable, what you can see on the screenshot below:
+ * ![Misleading textures](https://raw.githubusercontent.com/Vixenka/bevy_dev/master/images/prototype_material/misleading_textures.webp)
+ *
+ * But with tool from this create you can archive better results just by change few chars:
+ * ```rust
+ * commands.spawn(PrototypeMaterialMeshBundle {
+ *     mesh: meshes.add(shape::Box::new(50.0, 2.0, 50.0).into()),
+ *     material: "floor",
+ *     ..default()
+ * });
+ * ```
+ * Previous red color changed to string, why? Because in this case you can simple describe what you want to add here in future like `player hat` or whatever you want. Color is random generated based on this string, which means you will get the same color for every next program run.
+ * And this will be the result of this small changes:
+ * ![Prototype material](https://raw.githubusercontent.com/Vixenka/bevy_dev/master/images/prototype_material/showcase.webp)
+ */
+
 use std::{
     collections::hash_map::DefaultHasher,
     hash::{Hash, Hasher},
@@ -19,6 +47,9 @@ const SHADER_PATH: &str = "shaders/prototype_material.wgsl";
 const SHADER_HANDLE: Handle<Shader> =
     Handle::weak_from_u128(uuid!("0ced3da7-55d3-43be-9e04-5637b0e9ceef").as_u128());
 
+/// Plugin for [`crate::prototype_material`] feature. Attachts resources and initialization system.
+/// # Remarks
+/// This plugin is necessary to use [`crate::prototype_material`] feature. It is added to [`App`] by [`crate::DevPlugins`].
 pub struct PrototypeMaterialPlugin;
 
 impl Plugin for PrototypeMaterialPlugin {
@@ -29,15 +60,16 @@ impl Plugin for PrototypeMaterialPlugin {
     }
 }
 
+/// Component which includes [`PrototypeMaterialAsset`] to [`Entity`] in the next [`PostUpdate`].
 #[derive(Component, Debug, Clone, Copy)]
 pub struct PrototypeMaterial {
     color: Color,
 }
 
 impl PrototypeMaterial {
-    /// Creates a prototype material component that includes the [`PrototypeMaterialAsset`] in the next [`PostUpdate`].
+    /// Creates a prototype material with procedural color.
     /// # Arguments
-    /// * `feature_name` - Describe the feature that this prototype material is for, e.g. `floor` or `wall`. It is used to generate a random color that is the same every time the program is run.
+    /// * `feature_name` - Describe the feature that this prototype material is for, e.g. `floor` or `wall`. It is used to generate a procedural color that is the same every time the program is run.
     pub fn new(feature_name: &str) -> Self {
         let mut hasher = DefaultHasher::new();
         feature_name.hash(&mut hasher);
@@ -54,6 +86,7 @@ impl PrototypeMaterial {
     }
 }
 
+/// A [`Material`] that uses a [`PrototypeMaterialAsset`] shader.
 #[derive(Asset, AsBindGroup, TypePath, Debug, Clone)]
 pub struct PrototypeMaterialAsset {
     #[uniform(0)]
@@ -131,7 +164,7 @@ fn initialization(
     }
 }
 
-/// A component bundle for entities with a [`Mesh`] and a [`PrototypeMaterial`].
+/// A component bundle for entities with a [`Mesh`] and a [`PrototypeMaterial`]'s logic.
 #[derive(Default, Clone)]
 pub struct PrototypeMaterialMeshBundle {
     pub mesh: Handle<Mesh>,
@@ -170,8 +203,7 @@ unsafe impl bevy::ecs::bundle::Bundle for PrototypeMaterialMeshBundle {
             components, storages, &mut *ids,
         );
     }
-    #[allow(unused_variables, non_snake_case)]
-    unsafe fn from_components<__T, __F>(ctx: &mut __T, func: &mut __F) -> Self
+    unsafe fn from_components<__T, __F>(_ctx: &mut __T, _func: &mut __F) -> Self
     where
         __F: FnMut(&mut __T) -> bevy::ecs::ptr::OwningPtr<'_>,
     {
