@@ -17,7 +17,7 @@ bevy = { version = "0.13.0", default-features = false, features = [
     "png",
 ] }
 random_color = "0.8.0"
-rust-embed = "8.2.0"
+rust-embed = "8.3.0"
 uuid = "1.7.0"
 
 [dev-dependencies]
