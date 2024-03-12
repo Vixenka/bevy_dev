@@ -11,7 +11,7 @@ license-file = "LICENSE"
 edition = "2021"
 
 [dependencies]
-bevy = { version = "0.12.1", default-features = false, features = [
+bevy = { version = "0.13.0", default-features = false, features = [
     "bevy_render",
     "bevy_pbr",
     "png",
@@ -21,7 +21,7 @@ rust-embed = "8.2.0"
 uuid = "1.7.0"
 
 [dev-dependencies]
-bevy = { version = "0.12.1", default-features = false, features = [
+bevy = { version = "0.13.0", default-features = false, features = [
     "bevy_winit",
     "tonemapping_luts",
 ] }

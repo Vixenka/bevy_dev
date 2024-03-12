@@ -13,21 +13,20 @@ fn main() {
 
 fn setup(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>) {
     commands.spawn(PrototypeMaterialMeshBundle {
-        mesh: meshes.add(shape::Box::new(50.0, 2.0, 50.0).into()),
+        mesh: meshes.add(Cuboid::new(50.0, 2.0, 50.0)),
         material: "floor",
         ..default()
     });
 
     commands.spawn(PrototypeMaterialMeshBundle {
         transform: Transform::from_xyz(-1.0, 1.0, -0.5),
-        mesh: meshes.add(shape::Box::new(4.0, 2.0, 1.0).into()),
+        mesh: meshes.add(Cuboid::new(4.0, 2.0, 1.0)),
         material: "wall",
         ..default()
     });
 
     commands.spawn(DirectionalLightBundle {
         directional_light: DirectionalLight {
-            illuminance: 32000.0,
             shadows_enabled: true,
             ..default()
         },

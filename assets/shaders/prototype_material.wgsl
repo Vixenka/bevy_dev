@@ -1,4 +1,3 @@
-#import bevy_render::instance_index::get_instance_index
 #import bevy_pbr::{
     mesh_functions::{get_model_matrix, mesh_position_local_to_clip, mesh_position_local_to_world, mesh_normal_local_to_world},
     pbr_types::pbr_input_new,
@@ -38,7 +37,7 @@ fn vertex(vertex: Vertex) -> VertexOutput {
     out.scaled_local_position = vertex.position * extract_scale(model_matrix);
     out.local_normal = vertex.normal;
     out.world_position = mesh_position_local_to_world(model_matrix, vec4f(vertex.position, 1.0));
-    out.world_normal = mesh_normal_local_to_world(vertex.normal, get_instance_index(vertex.instance_index));
+    out.world_normal = mesh_normal_local_to_world(vertex.normal, vertex.instance_index);
     out.instance_index = vertex.instance_index;
 
     return out;
@@ -48,9 +47,9 @@ struct PrototypeMaterial {
     color: vec4f,
 };
 
-@group(1) @binding(0) var<uniform> material: PrototypeMaterial;
-@group(1) @binding(1) var base_texture: texture_2d<f32>;
-@group(1) @binding(2) var base_sampler: sampler;
+@group(2) @binding(0) var<uniform> material: PrototypeMaterial;
+@group(2) @binding(1) var base_texture: texture_2d<f32>;
+@group(2) @binding(2) var base_sampler: sampler;
 
 fn sample_triplanar(texture: texture_2d<f32>, texture_sampler: sampler, position: vec3f, normal: vec3f) -> vec4f {
     let threshold = 0.8;
