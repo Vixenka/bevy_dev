@@ -11,6 +11,7 @@
  * You can just use a [`DevPlugins`] plugin to enable all default features or you can add only features you need by adding feature's plugins directly.
  */
 
+pub mod debug_camera;
 pub mod prelude;
 pub mod prototype_material;
 
@@ -20,6 +21,7 @@ use rust_embed::RustEmbed;
 /// Plugin which enables default development features from `bevy_dev` crate.
 /// # Remarks
 /// This plugin contains this plugins:
+/// - [`debug_camera::DebugCameraPlugin`]
 /// - [`prototype_material::PrototypeMaterialPlugin`]
 /// # Examples
 /// You need to add this plugin to your Bevy's app to use features. Or you can add only features you need by adding feature's plugins directly.
@@ -34,7 +36,8 @@ pub struct DevPlugins;
 
 impl Plugin for DevPlugins {
     fn build(&self, app: &mut App) {
-        app.add_plugins(prototype_material::PrototypeMaterialPlugin);
+        app.add_plugins(debug_camera::DebugCameraPlugin::default())
+            .add_plugins(prototype_material::PrototypeMaterialPlugin);
     }
 }
 
