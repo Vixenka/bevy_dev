@@ -15,6 +15,9 @@ pub mod debug_camera;
 pub mod prelude;
 pub mod prototype_material;
 
+#[cfg(feature = "ui")]
+pub mod ui;
+
 use bevy::prelude::*;
 use rust_embed::RustEmbed;
 
@@ -36,6 +39,9 @@ pub struct DevPlugins;
 
 impl Plugin for DevPlugins {
     fn build(&self, app: &mut App) {
+        #[cfg(feature = "ui")]
+        app.add_plugins(ui::DebugUiPlugin);
+
         app.add_plugins(debug_camera::DebugCameraPlugin::default())
             .add_plugins(prototype_material::PrototypeMaterialPlugin);
     }
