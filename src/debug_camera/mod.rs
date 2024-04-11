@@ -93,7 +93,7 @@ impl Default for DebugCamera {
             speed_increase: 0.2,
             speed_multiplier: 1.0,
             speed_multiplier_range: 0.001..=10.0,
-            sensitivity: 0.001,
+            sensitivity: 0.1,
             base_speed: 4.5,
             focus: true,
         }
@@ -103,7 +103,6 @@ impl Default for DebugCamera {
 #[derive(Debug, Component)]
 pub(super) struct DebugCameraData {
     id: u64,
-    rotation: Vec2,
     last_change_position_time: f32,
     current_speed: f32,
 }
@@ -268,8 +267,6 @@ fn initialization(
                 None => Transform::default(),
             },
         };
-        let rotation = transform.rotation.to_euler(EulerRot::ZYX);
-        let rotation = Vec2::new(rotation.2, rotation.1);
 
         // Deactive origin camera, and manage window
         if debug_camera.focus {
@@ -309,7 +306,6 @@ fn initialization(
             },
             DebugCameraData {
                 id,
-                rotation,
                 last_change_position_time: 0.0,
                 current_speed: debug_camera.base_speed,
             },
@@ -469,10 +465,10 @@ fn controller(
         translation += Vec3::from(transform.local_x());
     }
     if keys.pressed(KeyCode::KeyQ) {
-        translation += Vec3::Y;
+        translation -= Vec3::Y;
     }
     if keys.pressed(KeyCode::KeyE) {
-        translation -= Vec3::Y;
+        translation += Vec3::Y;
     }
 
     transform.translation += translation.normalize_or_zero()
@@ -480,12 +476,14 @@ fn controller(
 
     // Rotation
     for input in mouse_motion.read() {
-        let x = (data.rotation.x - input.delta.y * debug_camera.sensitivity)
-            .clamp(-MOUSE_LOOK_X_LIMIT, MOUSE_LOOK_X_LIMIT);
-        let y = data.rotation.y - input.delta.x * debug_camera.sensitivity;
+        let (mut y, mut x, _) = transform.rotation.to_euler(EulerRot::YXZ);
 
-        data.rotation = Vec2::new(x, y);
-        transform.rotation = Quat::from_euler(EulerRot::ZYX, 0.0, data.rotation.y, data.rotation.x);
+        x -= (input.delta.y * debug_camera.sensitivity).to_radians();
+        x = x.clamp(-MOUSE_LOOK_X_LIMIT, MOUSE_LOOK_X_LIMIT);
+
+        y -= (input.delta.x * debug_camera.sensitivity).to_radians();
+
+        transform.rotation = Quat::from_rotation_y(y) * Quat::from_rotation_x(x);
     }
 
     // Increase speed
