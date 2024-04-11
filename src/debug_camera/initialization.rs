@@ -63,5 +63,8 @@ pub(super) fn system(
                 current_speed: debug_camera.base_speed,
             },
         ));
+
+        // Notify
+        bevy::log::info!("Spawned new 3D debug camera #{}", id);
     }
 }

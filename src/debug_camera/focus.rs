@@ -73,24 +73,29 @@ pub(super) fn system(
             }
         } else if camera.is_active {
             // Deactive game camera
-            let mut primary_window = window
-                .get_single_mut()
+            let primary_window = window
+                .get_single()
                 .expect("Expected primary window to exist");
 
             global.last_used_origin_camera = Some(DebugCameraLastUsedOriginCameraData {
                 camera: entity,
                 cursor: primary_window.cursor,
             });
-
-            primary_window.cursor.grab_mode = CursorGrabMode::Locked;
-            primary_window.cursor.visible = false;
         }
 
         camera.is_active = false;
     }
 
-    // Switch to game camera if no debug camera is active
-    if !is_any_debug_camera_active {
+    if is_any_debug_camera_active {
+        // Lock cursor
+        let mut primary_window = window
+            .get_single_mut()
+            .expect("Expected primary window to exist");
+
+        primary_window.cursor.grab_mode = CursorGrabMode::Locked;
+        primary_window.cursor.visible = false;
+    } else {
+        // Switch to game camera if no debug camera is active
         if let Some(last) = global.last_used_origin_camera.take() {
             // Activate previous game camera
             if let Ok(mut camera) = cameras.get_mut(last.camera) {

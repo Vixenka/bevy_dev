@@ -1,6 +1,10 @@
 use std::{fmt::Debug, ops::RangeInclusive};
 
-use bevy::{prelude::*, window::Cursor};
+use bevy::{
+    input::mouse::{MouseMotion, MouseWheel},
+    prelude::*,
+    window::Cursor,
+};
 
 #[cfg(feature = "ui")]
 use crate::ui::popup::PopupEvent;
@@ -16,9 +20,18 @@ const SELECTOR_NEXT_ELEMENT_THRESHOLD_IN_SECONDS: f32 = 0.25;
 #[cfg(feature = "ui")]
 const SELECTOR_NEXT_ELEMENT_IN_SECONDS: f32 = 0.1;
 
-#[derive(Default)]
 pub struct DebugCameraPlugin {
     pub switcher: DebugCameraSwitcher,
+    pub spawn_debug_camera_if_any_camera_exist: bool,
+}
+
+impl Default for DebugCameraPlugin {
+    fn default() -> Self {
+        Self {
+            switcher: Default::default(),
+            spawn_debug_camera_if_any_camera_exist: true,
+        }
+    }
 }
 
 impl Plugin for DebugCameraPlugin {
@@ -45,6 +58,10 @@ impl Plugin for DebugCameraPlugin {
         };
         if active_spawner {
             app.add_systems(Update, switcher);
+        }
+
+        if self.spawn_debug_camera_if_any_camera_exist {
+            app.add_systems(PostUpdate, spawn_debug_camera_if_any_camera_exist);
         }
     }
 }
@@ -117,11 +134,6 @@ pub(super) struct DebugCameraData {
     current_speed: f32,
 }
 
-fn spawn_new_debug_camera(commands: &mut Commands) {
-    commands.spawn(DebugCamera::default());
-    bevy::log::info!("Spawned new 3D debug camera");
-}
-
 #[allow(clippy::too_many_arguments)]
 fn switcher(
     mut commands: Commands,
@@ -143,7 +155,7 @@ fn switcher(
 
     // Spawn new
     if keys.just_pressed(KeyCode::F1) {
-        spawn_new_debug_camera(&mut commands);
+        commands.spawn(DebugCamera::default());
         return;
     }
 
@@ -168,7 +180,7 @@ fn switcher(
             },
             None => {
                 if global.last_used_debug_cameras.is_empty() {
-                    spawn_new_debug_camera(&mut commands);
+                    commands.spawn(DebugCamera::default());
                     return;
                 }
 
@@ -207,4 +219,23 @@ fn select_next_camera_key_event(
     } else {
         false
     }
+}
+
+fn spawn_debug_camera_if_any_camera_exist(
+    mut commands: Commands,
+    mut mouse_motion: EventReader<MouseMotion>,
+    mut mouse_wheel: EventReader<MouseWheel>,
+    query: Query<(), With<Camera>>,
+) {
+    if query.is_empty() {
+        commands.spawn(DebugCamera::default()).insert(Transform {
+            translation: Vec3::new(0.0, 0.0, -5.0),
+            rotation: Quat::from_rotation_y(180.0f32.to_radians()),
+            ..Default::default()
+        });
+    }
+
+    // Clear first gained events
+    mouse_motion.clear();
+    mouse_wheel.clear();
 }
