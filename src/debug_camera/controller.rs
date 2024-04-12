@@ -34,12 +34,13 @@ pub(super) fn system(
 
     // Speed
     for input in mouse_wheel.read() {
-        debug_camera.speed_multiplier = (debug_camera.speed_multiplier
-            * match input.y > 0.0 {
-                true => 1.1,
-                false => 0.9,
-            })
-        .clamp(
+        debug_camera.speed_level += input.y;
+        debug_camera.speed_level = debug_camera.speed_level.clamp(
+            (debug_camera.speed_multiplier_range.start().log2() * 4.0).floor(),
+            (debug_camera.speed_multiplier_range.end().log2() * 4.0).ceil(),
+        );
+
+        debug_camera.speed_multiplier = 2.0f32.powf(debug_camera.speed_level * 0.25).clamp(
             *debug_camera.speed_multiplier_range.start(),
             *debug_camera.speed_multiplier_range.end(),
         );

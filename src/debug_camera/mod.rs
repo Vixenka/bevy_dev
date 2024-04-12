@@ -108,6 +108,7 @@ pub struct DebugCameraLastUsedOriginCameraData {
 pub struct DebugCamera {
     pub speed_increase: f32,
     pub speed_multiplier: f32,
+    pub speed_level: f32,
     pub speed_multiplier_range: RangeInclusive<f32>,
     pub sensitivity: f32,
     pub base_speed: f32,
@@ -119,6 +120,7 @@ impl Default for DebugCamera {
         Self {
             speed_increase: 0.2,
             speed_multiplier: 1.0,
+            speed_level: 0.0,
             speed_multiplier_range: 0.001..=10.0,
             sensitivity: 0.1,
             base_speed: 4.5,
