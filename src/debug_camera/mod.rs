@@ -21,7 +21,15 @@ const SELECTOR_NEXT_ELEMENT_THRESHOLD_IN_SECONDS: f32 = 0.25;
 const SELECTOR_NEXT_ELEMENT_IN_SECONDS: f32 = 0.1;
 
 pub struct DebugCameraPlugin {
+    /// Allows to switch between cameras, and spawn new debug cameras.
     pub switcher: DebugCameraSwitcher,
+    /// Show debug camera renderer preview in selector UI.
+    #[cfg(feature = "ui")]
+    pub show_preview: bool,
+    /// Spawn debug camera if any camera exist.
+    ///
+    /// # Remarks
+    /// Camera is spawned with default values in any [`PostUpdate`] stage if any camera exist.
     pub spawn_debug_camera_if_any_camera_exist: bool,
 }
 
@@ -29,6 +37,8 @@ impl Default for DebugCameraPlugin {
     fn default() -> Self {
         Self {
             switcher: Default::default(),
+            #[cfg(feature = "ui")]
+            show_preview: true,
             spawn_debug_camera_if_any_camera_exist: true,
         }
     }
@@ -57,7 +67,12 @@ impl Plugin for DebugCameraPlugin {
             DebugCameraSwitcher::Disabled => false,
         };
         if active_spawner {
-            app.add_systems(Update, switcher);
+            app.add_systems(Update, switcher.before(initialization::system));
+
+            #[cfg(feature = "ui")]
+            if self.show_preview {
+                app.add_plugins(ui::DebugCameraPreviewPlugin);
+            }
         }
 
         if self.spawn_debug_camera_if_any_camera_exist {
@@ -139,7 +154,17 @@ pub(super) struct DebugCameraData {
 #[allow(clippy::too_many_arguments)]
 fn switcher(
     mut commands: Commands,
-    mut debug_cameras: Query<(Entity, &mut DebugCamera, &DebugCameraData)>,
+    #[cfg(not(feature = "ui"))] mut debug_cameras: Query<(
+        Entity,
+        &mut DebugCamera,
+        &DebugCameraData,
+    )>,
+    #[cfg(feature = "ui")] mut debug_cameras: Query<(
+        Entity,
+        &mut DebugCamera,
+        &DebugCameraData,
+        Option<&ui::DebugCameraPreview>,
+    )>,
     mut global: ResMut<DebugCameraGlobalData>,
     keys: Res<ButtonInput<KeyCode>>,
     #[cfg(feature = "ui")] mut popup_event: EventWriter<PopupEvent>,
