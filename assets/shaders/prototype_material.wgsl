@@ -70,20 +70,33 @@ fn sample_triplanar(texture: texture_2d<f32>, texture_sampler: sampler, position
     finalWeights /= finalWeights.x + finalWeights.y + finalWeights.z;
 
     var result = vec4(0.0, 0.0, 0.0, 0.0);
-    var temp = textureSample(texture, texture_sampler, position.zy);
+    var temp = textureSample(texture, texture_sampler, adjust_rotation(position.zy, normal));
     if finalWeights.x > 0.0 {
         result += finalWeights.x * temp;
     }
-    temp = textureSample(texture, texture_sampler, position.xz);
+    temp = textureSample(texture, texture_sampler, adjust_rotation(position.xz, normal));
     if finalWeights.y > 0.0 {
         result += finalWeights.y * temp;
     }
-    temp = textureSample(texture, texture_sampler, position.xy);
+    temp = textureSample(texture, texture_sampler, adjust_rotation(position.xy, normal));
     if finalWeights.z > 0.0 {
         result += finalWeights.z * temp;
     }
 
     return result;
+}
+
+/// Adjusts the UV coordinates based on the normal of the surface for more consistent texturing.
+fn adjust_rotation(position: vec2f, normal: vec3f) -> vec2f {
+    var p = position;
+
+    if normal.x < 0.0 || normal.z > 0.0 {
+        p.y = 1.0 - p.y;
+    } else if normal.x > 0.0 || normal.z < 0.0 {
+        p = vec2(1.0, 1.0) - p;
+    }
+
+    return p;
 }
 
 @fragment

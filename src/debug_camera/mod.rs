@@ -97,6 +97,7 @@ pub struct DebugCameraGlobalData {
     pub last_used_debug_cameras: Vec<Entity>,
     pub last_used_origin_camera: Option<DebugCameraLastUsedOriginCameraData>,
     pub(super) selected_camera: Option<usize>,
+    #[cfg(feature = "ui")]
     last_switch_time: f32,
     next_id: u64,
 }
@@ -108,6 +109,7 @@ impl Default for DebugCameraGlobalData {
             last_used_debug_cameras: Vec::new(),
             last_used_origin_camera: None,
             selected_camera: None,
+            #[cfg(feature = "ui")]
             last_switch_time: 0.0,
             next_id: 1,
         }
@@ -272,6 +274,7 @@ fn switcher(
     }
 }
 
+#[cfg(feature = "ui")]
 fn select_next_camera_key_event(
     global: &mut ResMut<DebugCameraGlobalData>,
     keys: &Res<ButtonInput<KeyCode>>,

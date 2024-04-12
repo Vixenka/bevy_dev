@@ -11,7 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Debug camera - tool for getting another perspective to the scene.
 - Rust feature `ui` - enables UI from this crate based on `egui`.
+- Popup - simple notifications for user, require `ui` feature enabled.
 - Changelog history (this file).
+
+### Fixed
+
+- [Fix orientation of procedural material texture on walls.](https://github.com/Vixenka/bevy_dev/issues/2)
 
 ## [0.2.0] - 2024-03-12
 
