@@ -8,7 +8,7 @@ use bevy::{
 #[cfg(feature = "ui")]
 use crate::ui::popup::{PopupEvent, PopupPosition};
 
-use super::{DebugCamera, DebugCameraData};
+use super::{DebugCamera, DebugCameraControls, DebugCameraData};
 
 const MOUSE_LOOK_X_LIMIT: f32 = PI / 2.0;
 const RESET_SPEED_THRESHOLD_IN_SECONDS: f32 = 0.2;
@@ -24,6 +24,7 @@ pub(super) fn system(
     mut mouse_wheel: EventReader<MouseWheel>,
     time: Res<Time>,
     keys: Res<ButtonInput<KeyCode>>,
+    controls: Res<DebugCameraControls>,
     #[cfg(feature = "ui")] mut popup_event: EventWriter<PopupEvent>,
 ) {
     let (mut transform, mut data, mut debug_camera, _) =
@@ -60,23 +61,23 @@ pub(super) fn system(
 
     // Position
     let mut translation = Vec3::ZERO;
-    if keys.pressed(KeyCode::KeyW) {
+    if keys.pressed(controls.move_forward) {
         translation -= Vec3::from(transform.local_z());
     }
-    if keys.pressed(KeyCode::KeyS) {
+    if keys.pressed(controls.move_backward) {
         translation += Vec3::from(transform.local_z());
     }
-    if keys.pressed(KeyCode::KeyA) {
+    if keys.pressed(controls.move_left) {
         translation -= Vec3::from(transform.local_x());
     }
-    if keys.pressed(KeyCode::KeyD) {
+    if keys.pressed(controls.move_right) {
         translation += Vec3::from(transform.local_x());
     }
-    if keys.pressed(KeyCode::KeyQ) {
-        translation -= Vec3::Y;
-    }
-    if keys.pressed(KeyCode::KeyE) {
+    if keys.pressed(controls.move_up) {
         translation += Vec3::Y;
+    }
+    if keys.pressed(controls.move_down) {
+        translation -= Vec3::Y;
     }
 
     transform.translation += translation.normalize_or_zero()

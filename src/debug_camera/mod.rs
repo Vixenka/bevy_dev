@@ -46,16 +46,18 @@ impl Default for DebugCameraPlugin {
 
 impl Plugin for DebugCameraPlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<DebugCameraGlobalData>().add_systems(
-            Update,
-            (
-                initialization::system,
-                focus::system
-                    .after(initialization::system)
-                    .run_if(focus::run_if_changed),
-                controller::system,
-            ),
-        );
+        app.init_resource::<DebugCameraGlobalData>()
+            .init_resource::<DebugCameraControls>()
+            .add_systems(
+                Update,
+                (
+                    initialization::system,
+                    focus::system
+                        .after(initialization::system)
+                        .run_if(focus::run_if_changed),
+                    controller::system,
+                ),
+            );
 
         let active_spawner = match self.switcher {
             DebugCameraSwitcher::Default => {
@@ -108,6 +110,48 @@ impl Default for DebugCameraGlobalData {
             selected_camera: None,
             last_switch_time: 0.0,
             next_id: 1,
+        }
+    }
+}
+
+/// Controls used for debug camera.
+#[derive(Debug, Resource)]
+pub struct DebugCameraControls {
+    /// Move forward key, default is [`KeyCode::KeyW`].
+    pub move_forward: KeyCode,
+    /// Move backward key, default is [`KeyCode::KeyS`].
+    pub move_backward: KeyCode,
+    /// Move left key, default is [`KeyCode::KeyA`].
+    pub move_left: KeyCode,
+    /// Move right key, default is [`KeyCode::KeyD`].
+    pub move_right: KeyCode,
+    /// Move up key, default is [`KeyCode::KeyE`].
+    pub move_up: KeyCode,
+    /// Move down key, default is [`KeyCode::KeyQ`].
+    pub move_down: KeyCode,
+    /// Base key used to use switcher, default is [`KeyCode::ShiftLeft`].
+    pub switcher_special: KeyCode,
+    /// Select next debug camera, default is [`KeyCode::Tab`].
+    pub switcher_next: KeyCode,
+    /// Spawn new debug camera, default is [`KeyCode::F1`].
+    pub new_debug_camera: KeyCode,
+    /// Return to game camera, default is [`KeyCode::Escape`].
+    pub return_to_game_camera: KeyCode,
+}
+
+impl Default for DebugCameraControls {
+    fn default() -> Self {
+        Self {
+            move_forward: KeyCode::KeyW,
+            move_backward: KeyCode::KeyS,
+            move_left: KeyCode::KeyA,
+            move_right: KeyCode::KeyD,
+            move_up: KeyCode::KeyE,
+            move_down: KeyCode::KeyQ,
+            switcher_special: KeyCode::ShiftLeft,
+            switcher_next: KeyCode::Tab,
+            new_debug_camera: KeyCode::F1,
+            return_to_game_camera: KeyCode::Escape,
         }
     }
 }
@@ -167,10 +211,11 @@ fn switcher(
     )>,
     mut global: ResMut<DebugCameraGlobalData>,
     keys: Res<ButtonInput<KeyCode>>,
+    controls: Res<DebugCameraControls>,
     #[cfg(feature = "ui")] mut popup_event: EventWriter<PopupEvent>,
     #[cfg(feature = "ui")] time: Res<Time>,
 ) {
-    if !keys.pressed(KeyCode::ShiftLeft) {
+    if !keys.pressed(controls.switcher_special) {
         if let Some(selected_camera) = global.selected_camera.take() {
             if selected_camera + 1 != global.last_used_debug_cameras.len() {
                 let entity = global.last_used_debug_cameras[selected_camera];
@@ -181,13 +226,13 @@ fn switcher(
     }
 
     // Spawn new
-    if keys.just_pressed(KeyCode::F1) {
+    if keys.just_pressed(controls.new_debug_camera) {
         commands.spawn(DebugCamera::default());
         return;
     }
 
     // Switch to game camera
-    if keys.just_pressed(KeyCode::Escape) {
+    if keys.just_pressed(controls.return_to_game_camera) {
         for mut debug_camera in debug_cameras.iter_mut() {
             debug_camera.1.focus = false;
         }
@@ -195,9 +240,9 @@ fn switcher(
 
     // Switch to selected debug camera
     #[cfg(not(feature = "ui"))]
-    let event = keys.just_pressed(KeyCode::Tab);
+    let event = keys.just_pressed(controls.switcher_next);
     #[cfg(feature = "ui")]
-    let event = select_next_camera_key_event(&mut global, &keys, &time);
+    let event = select_next_camera_key_event(&mut global, &keys, &controls, &time);
 
     if event {
         global.selected_camera = Some(match global.selected_camera {
@@ -230,15 +275,16 @@ fn switcher(
 fn select_next_camera_key_event(
     global: &mut ResMut<DebugCameraGlobalData>,
     keys: &Res<ButtonInput<KeyCode>>,
+    controls: &Res<DebugCameraControls>,
     time: &Res<Time>,
 ) -> bool {
-    if keys.just_pressed(KeyCode::Tab) {
+    if keys.just_pressed(controls.switcher_next) {
         global.last_switch_time =
             time.elapsed_seconds() + SELECTOR_NEXT_ELEMENT_THRESHOLD_IN_SECONDS;
         return true;
     }
 
-    if keys.pressed(KeyCode::Tab)
+    if keys.pressed(controls.switcher_next)
         && global.last_switch_time + SELECTOR_NEXT_ELEMENT_IN_SECONDS < time.elapsed_seconds()
     {
         global.last_switch_time = time.elapsed_seconds();
