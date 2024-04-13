@@ -1,7 +1,14 @@
+/*!
+ * Helpers for creating UI elements.
+ *
+ * Require feature `ui` to be enabled.
+ */
+
 use bevy::prelude::*;
 
 pub mod popup;
 
+/// Plugin for the debug UI.
 pub struct DebugUiPlugin;
 
 impl Plugin for DebugUiPlugin {

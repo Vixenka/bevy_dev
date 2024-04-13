@@ -1,3 +1,12 @@
+/*!
+ * All things related to popups.
+ *
+ * Example view:
+ *
+ * ![Popup](https://raw.githubusercontent.com/Vixenka/bevy_dev/master/images/debug_camera/switching.webp)
+ * ![Popup](https://raw.githubusercontent.com/Vixenka/bevy_dev/master/images/debug_camera/switching_without_preview.webp)
+ */
+
 use std::sync::Arc;
 
 use bevy::prelude::*;
@@ -15,12 +24,14 @@ impl Plugin for PopupPlugin {
     }
 }
 
+/// Position of the popup.
 #[derive(Debug, Clone)]
 pub enum PopupPosition {
     Center,
     BelowCenter,
 }
 
+/// Event for showing a popup.
 #[derive(Event, Clone)]
 pub struct PopupEvent {
     position: PopupPosition,
@@ -29,6 +40,9 @@ pub struct PopupEvent {
 }
 
 impl PopupEvent {
+    /// Creates a new popup event with the given position, time and UI contents.
+    /// # Remarks
+    /// Created value should be sent to the world via [`EventWriter<PopupEvent>`] to show it on the screen.
     pub fn new(
         position: PopupPosition,
         time: f32,
