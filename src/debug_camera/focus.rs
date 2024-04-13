@@ -4,11 +4,12 @@ use bevy::{
 };
 
 #[cfg(feature = "ui")]
+use super::ui::PreviewCamera;
+#[cfg(feature = "ui")]
 use crate::ui::popup::{PopupEvent, PopupPosition};
 
 use super::{
-    ui::PreviewCamera, DebugCamera, DebugCameraData, DebugCameraGlobalData,
-    DebugCameraLastUsedOriginCameraData,
+    DebugCamera, DebugCameraData, DebugCameraGlobalData, DebugCameraLastUsedOriginCameraData,
 };
 
 #[allow(clippy::type_complexity)]
@@ -20,7 +21,13 @@ pub(super) fn run_if_changed(
 
 #[allow(clippy::type_complexity)]
 pub(super) fn system(
-    mut cameras: Query<
+    #[cfg(not(feature = "ui"))] mut cameras: Query<(
+        Entity,
+        &mut Camera,
+        Option<&mut DebugCamera>,
+        Option<&DebugCameraData>,
+    )>,
+    #[cfg(feature = "ui")] mut cameras: Query<
         (
             Entity,
             &mut Camera,
