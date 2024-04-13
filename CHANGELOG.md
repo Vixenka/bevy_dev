@@ -36,7 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Prototype materials - simple, metrically correct, PBR compatible and randomly painted mesh for better differentiation of prototype objects.
+- Prototype material - simple, metrically correct, PBR compatible and randomly painted mesh for better differentiation of prototype objects.
 
 [unreleased]: https://github.com/Vixenka/bevy_dev/compare/v0.2.0...HEAD
 [0.2.0]: https://github.com/Vixenka/bevy_dev/compare/v0.1.1...v0.2.0

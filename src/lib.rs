@@ -4,6 +4,7 @@
  * ![Showcase](https://raw.githubusercontent.com/Vixenka/bevy_dev/master/images/prototype_material/showcase.webp)
  *
  * ### Features
+ * - [x] [Debug camera](debug_camera/index.html) - tool for getting another perspective to the scene, also known as fly camera.
  * - [x] [Prototype materials](prototype_material/index.html) - simple, metrically correct, PBR compatible and randomly painted mesh for better differentiation of prototype objects.
  *
  * ### Initialization
@@ -26,6 +27,7 @@ use rust_embed::RustEmbed;
 /// This plugin contains this plugins:
 /// - [`debug_camera::DebugCameraPlugin`]
 /// - [`prototype_material::PrototypeMaterialPlugin`]
+/// - [`ui::DebugUiPlugin`] if `ui` feature is enabled
 /// # Examples
 /// You need to add this plugin to your Bevy's app to use features. Or you can add only features you need by adding feature's plugins directly.
 /// ```

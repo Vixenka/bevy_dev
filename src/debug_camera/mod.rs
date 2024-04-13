@@ -1,3 +1,5 @@
+#![doc = include_str!("../../docs/features/debug_camera.md")]
+
 use std::{fmt::Debug, ops::RangeInclusive};
 
 use bevy::{
@@ -24,6 +26,11 @@ pub struct DebugCameraPlugin {
     /// Allows to switch between cameras, and spawn new debug cameras.
     pub switcher: DebugCameraSwitcher,
     /// Show debug camera renderer preview in selector UI.
+    ///
+    /// If enabled
+    /// ![Preview enabled](https://raw.githubusercontent.com/Vixenka/bevy_dev/master/images/debug_camera/switching.webp)
+    /// If disabled
+    /// ![Preview disabled](https://raw.githubusercontent.com/Vixenka/bevy_dev/master/images/debug_camera/switching_without_preview.webp)
     #[cfg(feature = "ui")]
     pub show_preview: bool,
     /// Spawn debug camera if any camera exist.
@@ -38,7 +45,7 @@ impl Default for DebugCameraPlugin {
         Self {
             switcher: Default::default(),
             #[cfg(feature = "ui")]
-            show_preview: true,
+            show_preview: false,
             spawn_debug_camera_if_any_camera_exist: true,
         }
     }
