@@ -31,5 +31,7 @@ fn main() {
 | 0.13.0 | 0.2           |
 | 0.12.1 | 0.1 - 0.1.1   |
 
+Read more in the [changelog](/CHANGELOG.md).
+
 ## License
 bevy_dev is licensed under the [MIT](/LICENSE) license.
