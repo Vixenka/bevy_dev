@@ -1,7 +1,7 @@
 /*!
  * Dev tools for [Bevy Engine](https://bevyengine.org/). For faster prototyping.
  *
- * ![Showcase](https://raw.githubusercontent.com/Vixenka/bevy_dev/master/images/prototype_material/showcase.webp)
+ * [![Showcase](https://raw.githubusercontent.com/Vixenka/bevy_dev/master/images/debug_camera/showcase.webp)](https://github.com/Vixenka/bevy_dev/assets/44348304/073d635c-3d58-4c36-8e01-8a8686f5060b)
  *
  * ### Features
  * - [x] [Debug camera](debug_camera/index.html) - tool for getting another perspective to the scene, also known as fly camera.
