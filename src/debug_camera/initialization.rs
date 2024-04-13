@@ -61,6 +61,7 @@ pub(super) fn system(
                 id,
                 last_change_position_time: 0.0,
                 current_speed: debug_camera.base_speed,
+                speed_level: 0.0,
             },
         ));
 

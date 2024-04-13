@@ -22,6 +22,12 @@ const SELECTOR_NEXT_ELEMENT_THRESHOLD_IN_SECONDS: f32 = 0.25;
 #[cfg(feature = "ui")]
 const SELECTOR_NEXT_ELEMENT_IN_SECONDS: f32 = 0.1;
 
+/// Plugin for [`crate::debug_camera`] feature.
+///
+/// # Remarks
+/// This plugin is necessary to use [`crate::debug_camera`] feature. It is added to App by [`crate::DevPlugins`].
+///
+/// If `ui` feature is enabled, it will require to add [`crate::ui::DebugUiPlugin`] to App, before adding this.
 pub struct DebugCameraPlugin {
     /// Allows to switch between cameras, and spawn new debug cameras.
     pub switcher: DebugCameraSwitcher,
@@ -98,18 +104,26 @@ impl Plugin for DebugCameraPlugin {
     }
 }
 
+/// Setting for debug camera switcher.
 #[derive(Default)]
 pub enum DebugCameraSwitcher {
+    /// The same as [`DebugCameraSwitcher::Active`], but in release builds it will make a warning.
     #[default]
     Default,
+    /// Active debug camera switcher.
     Active,
+    /// Disable debug camera switcher.
     Disabled,
 }
 
+/// Global data for debug camera.
 #[derive(Debug, Resource)]
 pub struct DebugCameraGlobalData {
+    /// Default values for new created debug cameras.
     pub default_value: DebugCamera,
+    /// Last used debug cameras, in order.
     pub last_used_debug_cameras: Vec<Entity>,
+    /// Last used origin camera.
     pub last_used_origin_camera: Option<DebugCameraLastUsedOriginCameraData>,
     pub(super) selected_camera: Option<usize>,
     #[cfg(feature = "ui")]
@@ -173,21 +187,30 @@ impl Default for DebugCameraControls {
     }
 }
 
+/// Container which contains data about last used origin camera.
 #[derive(Debug)]
 pub struct DebugCameraLastUsedOriginCameraData {
+    /// Entity of last used origin camera.
     pub camera: Entity,
+    /// Cursor of window before switching to debug camera.
     pub cursor: Cursor,
 }
 
+/// Debug camera component. Apply to entity to make it debug camera.
 #[derive(Component, Debug, Clone)]
 #[non_exhaustive]
 pub struct DebugCamera {
+    /// Speed increase during flight.
     pub speed_increase: f32,
+    /// Sensitivity of managing speed multiplier via mouse wheel.
     pub speed_multiplier: f32,
-    pub speed_level: f32,
+    /// Range of speed multiplier.
     pub speed_multiplier_range: RangeInclusive<f32>,
+    /// Sensitivity of camera rotation.
     pub sensitivity: f32,
+    /// Base speed of camera.
     pub base_speed: f32,
+    /// Focus on camera. Manage it activation.
     pub focus: bool,
 }
 
@@ -196,7 +219,6 @@ impl Default for DebugCamera {
         Self {
             speed_increase: 0.2,
             speed_multiplier: 1.0,
-            speed_level: 0.0,
             speed_multiplier_range: 0.001..=10.0,
             sensitivity: 0.1,
             base_speed: 4.5,
@@ -210,6 +232,7 @@ pub(super) struct DebugCameraData {
     id: u64,
     last_change_position_time: f32,
     current_speed: f32,
+    speed_level: f32,
 }
 
 #[allow(clippy::too_many_arguments)]
