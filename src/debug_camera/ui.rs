@@ -136,7 +136,7 @@ fn attach_image_to_new_debug_camera(
 }
 
 #[derive(Debug, Component)]
-struct PreviewCamera;
+pub(super) struct PreviewCamera;
 
 fn spawn_preview_camera(mut commands: Commands) {
     commands.spawn((

@@ -9,7 +9,7 @@ use bevy::{
 };
 
 #[cfg(feature = "ui")]
-use crate::ui::popup::PopupEvent;
+use crate::ui::popup::{PopupEvent, PopupPosition};
 
 mod controller;
 mod focus;
@@ -28,9 +28,17 @@ pub struct DebugCameraPlugin {
     /// Show debug camera renderer preview in selector UI.
     ///
     /// If enabled
+    ///
     /// ![Preview enabled](https://raw.githubusercontent.com/Vixenka/bevy_dev/master/images/debug_camera/switching.webp)
+    ///
     /// If disabled
+    ///
     /// ![Preview disabled](https://raw.githubusercontent.com/Vixenka/bevy_dev/master/images/debug_camera/switching_without_preview.webp)
+    ///
+    /// # Remarks
+    /// This feature requires `ui` feature to be enabled.
+    ///
+    /// Preview is rendered only when `UI` is showed, and rendered in low resolution. Only one debug camera refresh their preview in one frame, what do not affect performance so much.
     #[cfg(feature = "ui")]
     pub show_preview: bool,
     /// Spawn debug camera if any camera exist.
@@ -45,7 +53,7 @@ impl Default for DebugCameraPlugin {
         Self {
             switcher: Default::default(),
             #[cfg(feature = "ui")]
-            show_preview: false,
+            show_preview: true,
             spawn_debug_camera_if_any_camera_exist: true,
         }
     }
@@ -205,6 +213,7 @@ pub(super) struct DebugCameraData {
 }
 
 #[allow(clippy::too_many_arguments)]
+#[allow(clippy::type_complexity)]
 fn switcher(
     mut commands: Commands,
     #[cfg(not(feature = "ui"))] mut debug_cameras: Query<(
@@ -219,6 +228,15 @@ fn switcher(
         Option<&ui::DebugCameraPreview>,
     )>,
     mut global: ResMut<DebugCameraGlobalData>,
+    #[cfg(not(feature = "ui"))] cameras: Query<(), (With<Camera>, Without<DebugCamera>)>,
+    #[cfg(feature = "ui")] cameras: Query<
+        (),
+        (
+            With<Camera>,
+            Without<DebugCamera>,
+            Without<ui::PreviewCamera>,
+        ),
+    >,
     keys: Res<ButtonInput<KeyCode>>,
     controls: Res<DebugCameraControls>,
     #[cfg(feature = "ui")] mut popup_event: EventWriter<PopupEvent>,
@@ -242,8 +260,20 @@ fn switcher(
 
     // Switch to game camera
     if keys.just_pressed(controls.return_to_game_camera) {
-        for mut debug_camera in debug_cameras.iter_mut() {
-            debug_camera.1.focus = false;
+        if cameras.is_empty() {
+            bevy::log::info!("Unable to switch to game camera, no any camera exist");
+            #[cfg(feature = "ui")]
+            popup_event.send(PopupEvent::new(
+                PopupPosition::BelowCenter,
+                1.0,
+                move |ui| {
+                    ui.strong("Unable to switch to game camera, no any camera exist");
+                },
+            ));
+        } else {
+            for mut debug_camera in debug_cameras.iter_mut() {
+                debug_camera.1.focus = false;
+            }
         }
     }
 
@@ -308,7 +338,8 @@ fn spawn_debug_camera_if_any_camera_exist(
     mut commands: Commands,
     mut mouse_motion: EventReader<MouseMotion>,
     mut mouse_wheel: EventReader<MouseWheel>,
-    query: Query<(), With<Camera>>,
+    #[cfg(not(feature = "ui"))] query: Query<(), With<Camera>>,
+    #[cfg(feature = "ui")] query: Query<(), (With<Camera>, Without<ui::PreviewCamera>)>,
 ) {
     if query.is_empty() {
         commands.spawn(DebugCamera::default()).insert(Transform {
