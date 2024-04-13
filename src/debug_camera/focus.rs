@@ -7,7 +7,8 @@ use bevy::{
 use crate::ui::popup::{PopupEvent, PopupPosition};
 
 use super::{
-    DebugCamera, DebugCameraData, DebugCameraGlobalData, DebugCameraLastUsedOriginCameraData,
+    ui::PreviewCamera, DebugCamera, DebugCameraData, DebugCameraGlobalData,
+    DebugCameraLastUsedOriginCameraData,
 };
 
 #[allow(clippy::type_complexity)]
@@ -17,81 +18,88 @@ pub(super) fn run_if_changed(
     !cameras.is_empty()
 }
 
+#[allow(clippy::type_complexity)]
 pub(super) fn system(
-    mut cameras: Query<(
-        Entity,
-        &mut Camera,
-        Option<&mut DebugCamera>,
-        Option<&DebugCameraData>,
-    )>,
+    mut cameras: Query<
+        (
+            Entity,
+            &mut Camera,
+            Option<&mut DebugCamera>,
+            Option<&DebugCameraData>,
+        ),
+        Without<PreviewCamera>,
+    >,
     mut global: ResMut<DebugCameraGlobalData>,
     mut window: Query<&mut Window, With<PrimaryWindow>>,
     #[cfg(feature = "ui")] mut popup_event: EventWriter<PopupEvent>,
 ) {
     let mut is_any_debug_camera_active = false;
-    for (entity, mut camera, debug_camera, data) in cameras.iter_mut() {
-        if let Some(mut debug_camera) = debug_camera {
-            if debug_camera.is_changed() && debug_camera.focus {
-                is_any_debug_camera_active = true;
+    for (entity, mut camera, mut debug_camera, data) in cameras
+        .iter_mut()
+        .filter(|x| x.2.is_some() && x.3.is_some())
+        .map(|x| (x.0, x.1, x.2.unwrap(), x.3.unwrap()))
+    {
+        if debug_camera.is_changed() && debug_camera.focus {
+            is_any_debug_camera_active = true;
 
-                // Skip if camera is already active
-                if camera.is_active {
-                    continue;
-                }
-
-                // Active debug camera
-                camera.is_active = true;
-
-                // Set last used debug camera
-                for (i, e) in global.last_used_debug_cameras.iter().enumerate() {
-                    if *e == entity {
-                        global.last_used_debug_cameras.remove(i);
-                        break;
-                    }
-                }
-                global.last_used_debug_cameras.push(entity);
-
-                // Notify user
-                let id = data
-                    .expect("Initialization system should attach DebugCameraData component")
-                    .id;
-
-                bevy::log::info!("Switched to debug camera #{}", id);
-                #[cfg(feature = "ui")]
-                popup_event.send(PopupEvent::new(
-                    PopupPosition::BelowCenter,
-                    1.0,
-                    move |ui| {
-                        ui.strong(format!("Switched to debug camera #{}", id));
-                    },
-                ));
-
+            // Skip if camera is already active
+            if camera.is_active {
                 continue;
-            } else if debug_camera.focus {
-                // Deactive debug camera
-                debug_camera.bypass_change_detection().focus = false;
             }
-        } else if camera.is_active {
-            // Deactive game camera
-            let primary_window = window
-                .get_single()
-                .expect("Expected primary window to exist");
 
-            global.last_used_origin_camera = Some(DebugCameraLastUsedOriginCameraData {
-                camera: entity,
-                cursor: primary_window.cursor,
-            });
+            // Active debug camera
+            camera.is_active = true;
+
+            // Set last used debug camera
+            for (i, e) in global.last_used_debug_cameras.iter().enumerate() {
+                if *e == entity {
+                    global.last_used_debug_cameras.remove(i);
+                    break;
+                }
+            }
+            global.last_used_debug_cameras.push(entity);
+
+            // Notify user
+            let id = data.id;
+
+            bevy::log::info!("Switched to debug camera #{}", id);
+            #[cfg(feature = "ui")]
+            popup_event.send(PopupEvent::new(
+                PopupPosition::BelowCenter,
+                1.0,
+                move |ui| {
+                    ui.strong(format!("Switched to debug camera #{}", id));
+                },
+            ));
+
+            continue;
+        } else if debug_camera.focus {
+            // Deactive debug camera
+            debug_camera.bypass_change_detection().focus = false;
         }
 
         camera.is_active = false;
     }
 
     if is_any_debug_camera_active {
-        // Lock cursor
         let mut primary_window = window
             .get_single_mut()
             .expect("Expected primary window to exist");
 
+        // Deactive game camera
+        for (entity, mut camera, _, _) in cameras
+            .iter_mut()
+            .filter(|x| x.2.is_none() && x.1.is_active)
+        {
+            global.last_used_origin_camera = Some(DebugCameraLastUsedOriginCameraData {
+                camera: entity,
+                cursor: primary_window.cursor,
+            });
+
+            camera.is_active = false;
+        }
+
+        // Lock cursor
         primary_window.cursor.grab_mode = CursorGrabMode::Locked;
         primary_window.cursor.visible = false;
     } else {
