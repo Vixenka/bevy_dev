@@ -1,6 +1,6 @@
 [package]
 name = "bevy_dev"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["Vixen <infvix@gmail.com>"]
 description = "Dev tools for Bevy Engine"
 keywords = ["prototype", "devtools", "textures", "assets"]
