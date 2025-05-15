@@ -100,15 +100,15 @@ pub(super) fn system(
         {
             global.last_used_origin_camera = Some(DebugCameraLastUsedOriginCameraData {
                 camera: entity,
-                cursor: primary_window.cursor,
+                cursor: primary_window.cursor_options.clone(),
             });
 
             camera.is_active = false;
         }
 
         // Lock cursor
-        primary_window.cursor.grab_mode = CursorGrabMode::Locked;
-        primary_window.cursor.visible = false;
+        primary_window.cursor_options.grab_mode = CursorGrabMode::Locked;
+        primary_window.cursor_options.visible = false;
     } else {
         // Switch to game camera if no debug camera is active
         if let Some(last) = global.last_used_origin_camera.take() {
@@ -121,7 +121,7 @@ pub(super) fn system(
             let mut primary_window = window
                 .get_single_mut()
                 .expect("Expected primary window to exist");
-            primary_window.cursor = last.cursor;
+            primary_window.cursor_options = last.cursor;
 
             // Notify user
             bevy::log::info!("Switched to game camera");

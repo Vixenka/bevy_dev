@@ -6,11 +6,11 @@ use std::{
 };
 
 use bevy::{
+    image::{CompressedImageFormats, ImageFormat, ImageSampler, ImageType},
     prelude::*,
     render::{
         render_asset::RenderAssetUsages,
         render_resource::{AsBindGroup, ShaderRef},
-        texture::{CompressedImageFormats, ImageFormat, ImageSampler, ImageType},
     },
 };
 use random_color::{Luminosity, RandomColor};
@@ -56,7 +56,7 @@ impl PrototypeMaterial {
             .to_rgb_array();
 
         Self {
-            color: Color::rgb_u8(rgb[0], rgb[1], rgb[2]),
+            color: Color::srgb_u8(rgb[0], rgb[1], rgb[2]),
         }
     }
 }
@@ -65,10 +65,10 @@ impl PrototypeMaterial {
 #[derive(Asset, AsBindGroup, TypePath, Debug, Clone)]
 pub struct PrototypeMaterialAsset {
     #[uniform(0)]
-    color: Color,
+    pub color: LinearRgba,
     #[texture(1)]
     #[sampler(2)]
-    base_texture: Handle<Image>,
+    pub base_texture: Handle<Image>,
 }
 
 impl Material for PrototypeMaterialAsset {
@@ -99,6 +99,7 @@ fn initialization(
     }
 
     if resource.base_texture.is_none() {
+        info!("INITIALIZING BASE TEXUTRE");
         resource.base_texture = Some(
             images.add(
                 Image::from_buffer(
@@ -116,7 +117,7 @@ fn initialization(
         );
 
         shaders.insert(
-            SHADER_HANDLE,
+            &SHADER_HANDLE,
             Shader::from_wgsl(
                 String::from_utf8(
                     DevAssets::get(SHADER_PATH)
@@ -131,12 +132,13 @@ fn initialization(
     }
 
     for (entity, material) in entities.iter_mut() {
+        info!("ADDING MATEIRLA TO ENTITY");
         commands
             .entity(entity)
-            .insert(materials.add(PrototypeMaterialAsset {
-                color: material.color,
+            .insert(MeshMaterial3d(materials.add(PrototypeMaterialAsset {
+                color: material.color.to_linear(),
                 base_texture: resource.base_texture.clone().unwrap(),
-            }));
+            })));
     }
 }
 
@@ -156,50 +158,50 @@ pub struct PrototypeMaterialMeshBundle {
     pub view_visibility: ViewVisibility,
 }
 
-// Generated via `cargo expand` command and next slightly modified.
-unsafe impl bevy::ecs::bundle::Bundle for PrototypeMaterialMeshBundle {
-    fn component_ids(
-        components: &mut bevy::ecs::component::Components,
-        storages: &mut bevy::ecs::storage::Storages,
-        ids: &mut impl FnMut(bevy::ecs::component::ComponentId),
-    ) {
-        <Handle<Mesh> as bevy::ecs::bundle::Bundle>::component_ids(components, storages, &mut *ids);
-        <PrototypeMaterial as bevy::ecs::bundle::Bundle>::component_ids(
-            components, storages, &mut *ids,
-        );
-        <Transform as bevy::ecs::bundle::Bundle>::component_ids(components, storages, &mut *ids);
-        <GlobalTransform as bevy::ecs::bundle::Bundle>::component_ids(
-            components, storages, &mut *ids,
-        );
-        <Visibility as bevy::ecs::bundle::Bundle>::component_ids(components, storages, &mut *ids);
-        <InheritedVisibility as bevy::ecs::bundle::Bundle>::component_ids(
-            components, storages, &mut *ids,
-        );
-        <ViewVisibility as bevy::ecs::bundle::Bundle>::component_ids(
-            components, storages, &mut *ids,
-        );
-    }
-    unsafe fn from_components<__T, __F>(_ctx: &mut __T, _func: &mut __F) -> Self
-    where
-        __F: FnMut(&mut __T) -> bevy::ecs::ptr::OwningPtr<'_>,
-    {
-        panic!("PrototypeMaterialMeshBundle cannot be constructed from components because it contains a non-component field: `material`")
-    }
-}
+// // Generated via `cargo expand` command and next slightly modified.
+// unsafe impl bevy::ecs::bundle::Bundle for PrototypeMaterialMeshBundle {
+//     fn component_ids(
+//         components: &mut bevy::ecs::component::Components,
+//         storages: &mut bevy::ecs::storage::Storages,
+//         ids: &mut impl FnMut(bevy::ecs::component::ComponentId),
+//     ) {
+//         <Handle<Mesh> as bevy::ecs::bundle::Bundle>::component_ids(components, storages, &mut *ids);
+//         <PrototypeMaterial as bevy::ecs::bundle::Bundle>::component_ids(
+//             components, storages, &mut *ids,
+//         );
+//         <Transform as bevy::ecs::bundle::Bundle>::component_ids(components, storages, &mut *ids);
+//         <GlobalTransform as bevy::ecs::bundle::Bundle>::component_ids(
+//             components, storages, &mut *ids,
+//         );
+//         <Visibility as bevy::ecs::bundle::Bundle>::component_ids(components, storages, &mut *ids);
+//         <InheritedVisibility as bevy::ecs::bundle::Bundle>::component_ids(
+//             components, storages, &mut *ids,
+//         );
+//         <ViewVisibility as bevy::ecs::bundle::Bundle>::component_ids(
+//             components, storages, &mut *ids,
+//         );
+//     }
+//     unsafe fn from_components<__T, __F>(_ctx: &mut __T, _func: &mut __F) -> Self
+//     where
+//         __F: FnMut(&mut __T) -> bevy::ecs::ptr::OwningPtr<'_>,
+//     {
+//         panic!("PrototypeMaterialMeshBundle cannot be constructed from components because it contains a non-component field: `material`")
+//     }
+// }
 
-impl bevy::ecs::bundle::DynamicBundle for PrototypeMaterialMeshBundle {
-    #[allow(unused_variables)]
-    #[inline]
-    fn get_components(
-        self,
-        func: &mut impl FnMut(bevy::ecs::component::StorageType, bevy::ecs::ptr::OwningPtr<'_>),
-    ) {
-        self.mesh.get_components(&mut *func);
-        PrototypeMaterial::new(self.material).get_components(&mut *func);
-        self.transform.get_components(&mut *func);
-        self.global_transform.get_components(&mut *func);
-        self.visibility.get_components(&mut *func);
-        self.inherited_visibility.get_components(&mut *func);
-        self.view_visibility.get_components(&mut *func);
-    }
-}
+// impl bevy::ecs::bundle::DynamicBundle for PrototypeMaterialMeshBundle {
+//     #[allow(unused_variables)]
+//     #[inline]
+//     fn get_components(
+//         self,
+//         func: &mut impl FnMut(bevy::ecs::component::StorageType, bevy::ecs::ptr::OwningPtr<'_>),
+//     ) {
+//         self.mesh.get_components(&mut *func);
+//         PrototypeMaterial::new(self.material).get_components(&mut *func);
+//         self.transform.get_components(&mut *func);
+//         self.global_transform.get_components(&mut *func);
+//         self.visibility.get_components(&mut *func);
+//         self.inherited_visibility.get_components(&mut *func);
+//         self.view_visibility.get_components(&mut *func);
+//     }
+// }

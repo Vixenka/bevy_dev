@@ -48,15 +48,13 @@ pub(super) fn system(
 
         // Insert new components
         e.insert((
-            Camera3dBundle {
-                camera: Camera {
-                    is_active: false,
-                    ..Default::default()
-                },
-                global_transform,
-                transform,
+            Camera3d::default(),
+            Camera {
+                is_active: false,
                 ..Default::default()
             },
+            global_transform,
+            transform,
             DebugCameraData {
                 id,
                 last_change_position_time: 0.0,
