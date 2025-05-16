@@ -71,7 +71,7 @@ pub(super) fn system(
 
             bevy::log::info!("Switched to debug camera #{}", id);
             #[cfg(feature = "ui")]
-            popup_event.send(PopupEvent::new(
+            popup_event.write(PopupEvent::new(
                 PopupPosition::BelowCenter,
                 1.0,
                 move |ui| {
@@ -89,9 +89,10 @@ pub(super) fn system(
     }
 
     if is_any_debug_camera_active {
-        let mut primary_window = window
-            .get_single_mut()
-            .expect("Expected primary window to exist");
+        let Ok(mut primary_window) = window.single_mut() else {
+            error!("Expected primary window to exist");
+            return;
+        };
 
         // Deactive game camera
         for (entity, mut camera, _, _) in cameras
@@ -118,15 +119,16 @@ pub(super) fn system(
             }
 
             // Set cursor
-            let mut primary_window = window
-                .get_single_mut()
-                .expect("Expected primary window to exist");
+            let Ok(mut primary_window) = window.single_mut() else {
+                error!("Expected primary window to exist");
+                return;
+            };
             primary_window.cursor_options = last.cursor;
 
             // Notify user
             bevy::log::info!("Switched to game camera");
             #[cfg(feature = "ui")]
-            popup_event.send(PopupEvent::new(
+            popup_event.write(PopupEvent::new(
                 PopupPosition::BelowCenter,
                 1.0,
                 move |ui| {

@@ -1,6 +1,6 @@
 [package]
 name = "bevy_dev"
-version = "0.4.0"
+version = "0.5.0"
 authors = ["Vixen <infvix@gmail.com>"]
 description = "Dev tools for Bevy Engine"
 keywords = ["prototype", "devtools", "textures", "assets"]
@@ -15,20 +15,9 @@ default = ["ui"]
 ui = ["dep:bevy_egui"]
 
 [dependencies]
-bevy = {version = "0.15"}
-# bevy = { version = "0.15", default-features = false, features = [
-#     "bevy_render",
-#     "bevy_pbr",
-#     "png",
-# ] }
+bevy = {version = "0.16"}
 random_color = "0.8.0"
 rust-embed = "8.3.0"
 uuid = "1.7.0"
 
-bevy_egui = { version = "0.33", optional = true }
-
-# [dev-dependencies]
-# bevy = { version = "0.15", default-features = false, features = [
-#     "bevy_winit",
-#     "tonemapping_luts",
-# ] }
+bevy_egui = { version = "0.34", optional = true }
