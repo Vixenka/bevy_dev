@@ -99,7 +99,6 @@ fn initialization(
     }
 
     if resource.base_texture.is_none() {
-        info!("INITIALIZING BASE TEXUTRE");
         resource.base_texture = Some(
             images.add(
                 Image::from_buffer(
@@ -132,7 +131,6 @@ fn initialization(
     }
 
     for (entity, material) in entities.iter_mut() {
-        info!("ADDING MATEIRLA TO ENTITY");
         commands
             .entity(entity)
             .insert(MeshMaterial3d(materials.add(PrototypeMaterialAsset {
