@@ -37,7 +37,7 @@ pub(super) fn debug_camera_selector_ui(
 
     let selected_camera = global.selected_camera.unwrap();
 
-    popup_event.send(PopupEvent::new(PopupPosition::Center, 0.0, move |ui| {
+    popup_event.write(PopupEvent::new(PopupPosition::Center, 0.0, move |ui| {
         ui.horizontal_wrapped(|ui| {
             for (i, entity) in data.iter().enumerate().rev() {
                 ui.allocate_ui(
@@ -162,7 +162,9 @@ fn render_to_preview(
     global: Res<DebugCameraGlobalData>,
     time: Res<Time>,
 ) {
-    let mut preview_camera = preview_camera.single_mut();
+    let Ok(mut preview_camera) = preview_camera.single_mut() else {
+        return;
+    };
     if global.selected_camera.is_none() {
         preview_camera.0.is_active = false;
         return;
@@ -177,7 +179,8 @@ fn render_to_preview(
     };
     debug_camera.0.last_render_time = time.elapsed_secs();
 
-    preview_camera.0.target = RenderTarget::Image(debug_camera.0.image.clone());
+    let image_render_target = debug_camera.0.image.clone().into();
+    preview_camera.0.target = RenderTarget::Image(image_render_target);
     preview_camera.0.is_active = true;
 
     *preview_camera.1 = *debug_camera.1;

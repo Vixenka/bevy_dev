@@ -286,7 +286,7 @@ fn switcher(
         if cameras.is_empty() {
             bevy::log::info!("Unable to switch to game camera, no any camera exist");
             #[cfg(feature = "ui")]
-            popup_event.send(PopupEvent::new(
+            popup_event.write(PopupEvent::new(
                 PopupPosition::BelowCenter,
                 1.0,
                 move |ui| {

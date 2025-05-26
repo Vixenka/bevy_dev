@@ -49,7 +49,7 @@ pub(super) fn system(
         #[cfg(feature = "ui")]
         {
             let value = debug_camera.speed_multiplier;
-            popup_event.send(PopupEvent::new(
+            popup_event.write(PopupEvent::new(
                 PopupPosition::BelowCenter,
                 0.5,
                 move |ui| {

@@ -6,6 +6,7 @@ use std::{
 };
 
 use bevy::{
+    asset::weak_handle,
     image::{CompressedImageFormats, ImageFormat, ImageSampler, ImageType},
     prelude::*,
     render::{
@@ -14,13 +15,11 @@ use bevy::{
     },
 };
 use random_color::{Luminosity, RandomColor};
-use uuid::uuid;
 
 use crate::DevAssets;
 
 const SHADER_PATH: &str = "shaders/prototype_material.wgsl";
-const SHADER_HANDLE: Handle<Shader> =
-    Handle::weak_from_u128(uuid!("0ced3da7-55d3-43be-9e04-5637b0e9ceef").as_u128());
+const SHADER_HANDLE: Handle<Shader> = weak_handle!("0ced3da7-55d3-43be-9e04-5637b0e9ceef");
 
 /// Plugin for [`crate::prototype_material`] feature. Attachts resources and initialization system.
 /// # Remarks
