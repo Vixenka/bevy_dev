@@ -81,7 +81,7 @@ pub(super) fn system(
     }
 
     transform.translation += translation.normalize_or_zero()
-        * (data.current_speed * debug_camera.speed_multiplier * time.delta_seconds());
+        * (data.current_speed * debug_camera.speed_multiplier * time.delta_secs());
 
     // Rotation
     for input in mouse_motion.read() {
@@ -97,9 +97,8 @@ pub(super) fn system(
 
     // Increase speed
     if translation != Vec3::ZERO {
-        data.current_speed +=
-            data.current_speed * time.delta_seconds() * debug_camera.speed_increase;
-        data.last_change_position_time = time.elapsed_seconds();
+        data.current_speed += data.current_speed * time.delta_secs() * debug_camera.speed_increase;
+        data.last_change_position_time = time.elapsed_secs();
     } else if data.last_change_position_time > RESET_SPEED_THRESHOLD_IN_SECONDS {
         data.current_speed = debug_camera.base_speed;
     }

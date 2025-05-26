@@ -44,7 +44,7 @@ pub(super) fn debug_camera_selector_ui(
                     egui::vec2(PREVIEW_WIDTH as f32 + 3.0, PREVIEW_HEIGHT as f32 + 16.0),
                     |ui| {
                         Frame {
-                            inner_margin: Margin::same(1.5),
+                            inner_margin: Margin::same(1),
                             stroke: match selected_camera == i {
                                 true => Stroke::new(1.5, Color32::WHITE),
                                 false => Stroke::NONE,
@@ -140,11 +140,9 @@ pub(super) struct PreviewCamera;
 
 fn spawn_preview_camera(mut commands: Commands) {
     commands.spawn((
-        Camera3dBundle {
-            camera: Camera {
-                is_active: false,
-                ..Default::default()
-            },
+        Camera3d::default(),
+        Camera {
+            is_active: false,
             ..Default::default()
         },
         PreviewCamera,
@@ -177,7 +175,7 @@ fn render_to_preview(
         Some(camera) => camera,
         None => return,
     };
-    debug_camera.0.last_render_time = time.elapsed_seconds();
+    debug_camera.0.last_render_time = time.elapsed_secs();
 
     preview_camera.0.target = RenderTarget::Image(debug_camera.0.image.clone());
     preview_camera.0.is_active = true;

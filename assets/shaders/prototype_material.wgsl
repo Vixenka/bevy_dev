@@ -1,5 +1,5 @@
 #import bevy_pbr::{
-    mesh_functions::{get_model_matrix, mesh_position_local_to_clip, mesh_position_local_to_world, mesh_normal_local_to_world},
+    mesh_functions::{get_world_from_local, mesh_position_local_to_clip, mesh_position_local_to_world, mesh_normal_local_to_world},
     pbr_types::pbr_input_new,
     pbr_functions::{apply_pbr_lighting, calculate_view, prepare_world_normal},
     mesh_bindings::mesh,
@@ -32,7 +32,7 @@ fn extract_scale(model_matrix: mat4x4f) -> vec3f {
 fn vertex(vertex: Vertex) -> VertexOutput {
     var out: VertexOutput;
 
-    let model_matrix = get_model_matrix(vertex.instance_index);
+    let model_matrix = get_world_from_local(vertex.instance_index);
     out.position = mesh_position_local_to_clip(model_matrix, vec4f(vertex.position, 1.0));
     out.scaled_local_position = vertex.position * extract_scale(model_matrix);
     out.local_normal = vertex.normal;
@@ -116,7 +116,7 @@ fn fragment(in: VertexOutput, @builtin(front_facing) is_front: bool) -> @locatio
     pbr_input.world_position = in.world_position;
     pbr_input.frag_coord = in.position;
     pbr_input.flags = mesh[in.instance_index].flags;
-    pbr_input.is_orthographic = view.projection[3].w == 1.0;
+    pbr_input.is_orthographic = view.clip_from_view[3].w == 1.0;
     pbr_input.V = calculate_view(in.world_position, pbr_input.is_orthographic);
     pbr_input.world_normal = prepare_world_normal(in.world_normal, false, is_front);
     pbr_input.N = normalize(pbr_input.world_normal);

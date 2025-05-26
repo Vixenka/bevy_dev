@@ -70,7 +70,7 @@ fn render(
     if events.is_empty() {
         if let Some(last) = &mut local.last {
             render_element(&mut ctx, last);
-            last.time -= time.delta_seconds();
+            last.time -= time.delta_secs();
             if last.time <= 0.0 {
                 local.last = None;
             }

@@ -5,7 +5,7 @@ use std::{fmt::Debug, ops::RangeInclusive};
 use bevy::{
     input::mouse::{MouseMotion, MouseWheel},
     prelude::*,
-    window::Cursor,
+    window::CursorOptions,
 };
 
 #[cfg(feature = "ui")]
@@ -193,7 +193,7 @@ pub struct DebugCameraLastUsedOriginCameraData {
     /// Entity of last used origin camera.
     pub camera: Entity,
     /// Cursor of window before switching to debug camera.
-    pub cursor: Cursor,
+    pub cursor: CursorOptions,
 }
 
 /// Debug camera component. Apply to entity to make it debug camera.
@@ -342,15 +342,14 @@ fn select_next_camera_key_event(
     time: &Res<Time>,
 ) -> bool {
     if keys.just_pressed(controls.switcher_next) {
-        global.last_switch_time =
-            time.elapsed_seconds() + SELECTOR_NEXT_ELEMENT_THRESHOLD_IN_SECONDS;
+        global.last_switch_time = time.elapsed_secs() + SELECTOR_NEXT_ELEMENT_THRESHOLD_IN_SECONDS;
         return true;
     }
 
     if keys.pressed(controls.switcher_next)
-        && global.last_switch_time + SELECTOR_NEXT_ELEMENT_IN_SECONDS < time.elapsed_seconds()
+        && global.last_switch_time + SELECTOR_NEXT_ELEMENT_IN_SECONDS < time.elapsed_secs()
     {
-        global.last_switch_time = time.elapsed_seconds();
+        global.last_switch_time = time.elapsed_secs();
         true
     } else {
         false
