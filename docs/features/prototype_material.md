@@ -14,11 +14,11 @@ a solid red or any other color which mixing in eyes. Scene with colors like that
 
 But with tool from this create you can archive better results just by change few chars:
 ```rust
-commands.spawn(PrototypeMaterialMeshBundle {
-    mesh: meshes.add(Cuboid::new(50.0, 2.0, 50.0)),
-    material: "floor",
-    ..default()
-});
+commands.spawn((
+    Mesh3d(meshes.add(Cuboid::new(50.0, 2.0, 50.0))),
+    PrototypeMaterial::new("floor"),
+    Transform::default(),
+));
 ```
 
 Previous red color changed to string, why? Because in this case you can simple describe what you want to add here in future like `player hat` or whatever you want. Color is random generated based on this string, which means you will get the same color for every next program run.

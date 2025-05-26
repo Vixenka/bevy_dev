@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2025-05-27
+
+### Changed
+
+- Bump `bevy` to `0.15`.
+- Remove or temporary delete `PrototypeMaterialMeshBundle`.
+
 ## [0.3.1] - 2024-04-24
 
 ### Fixed
