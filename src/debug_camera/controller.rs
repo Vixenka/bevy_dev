@@ -53,7 +53,7 @@ pub(super) fn system(
                 PopupPosition::BelowCenter,
                 0.5,
                 move |ui| {
-                    ui.label(format!("Speed multiplier: {:.2}", value));
+                    ui.label(format!("Speed multiplier: {value:.2}"));
                 },
             ));
         }

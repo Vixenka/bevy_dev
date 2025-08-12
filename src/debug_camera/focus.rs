@@ -75,7 +75,7 @@ pub(super) fn system(
                 PopupPosition::BelowCenter,
                 1.0,
                 move |ui| {
-                    ui.strong(format!("Switched to debug camera #{}", id));
+                    ui.strong(format!("Switched to debug camera #{id}"));
                 },
             ));
 

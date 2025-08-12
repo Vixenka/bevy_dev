@@ -1,6 +1,6 @@
 [package]
 name = "bevy_dev"
-version = "0.5.0"
+version = "0.6.0"
 authors = ["Vixen <hello@vixenka.com>"]
 description = "Dev tools for Bevy Engine"
 keywords = ["prototype", "devtools", "textures", "assets"]
@@ -8,7 +8,7 @@ categories = ["game-engines", "game-development"]
 readme = "README.md"
 repository = "https://github.com/Vixenka/bevy_dev"
 license = "MIT"
-edition = "2021"
+edition = "2024"
 
 [features]
 default = ["ui"]
@@ -16,8 +16,8 @@ ui = ["dep:bevy_egui"]
 
 [dependencies]
 bevy = "0.16"
-random_color = "0.8.0"
-rust-embed = "8.3.0"
-uuid = "1.7.0"
+random_color = "1"
+rust-embed = "8"
+uuid = "1"
 
-bevy_egui = { version = "0.34", optional = true }
+bevy_egui = { version = "0.36", optional = true }

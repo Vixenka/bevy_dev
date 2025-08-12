@@ -14,7 +14,7 @@ use bevy::{
         render_resource::{AsBindGroup, ShaderRef},
     },
 };
-use random_color::{Luminosity, RandomColor};
+use random_color::{options::Luminosity, RandomColor};
 
 use crate::DevAssets;
 

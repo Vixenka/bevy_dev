@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2025-08-12
+
+### Changed
+
+- Bump crate edition to 2024.
+- Fix some clippy issues.
+- Bump `random_color` to `1`.
+- Bump `rust-embed` to `8`.
+- Bump `uuid` to `1`.
+- Bump `bevy_egui` to `0.36`.
+
 ## [0.5.0] - 2025-05-27
 
 ### Changed

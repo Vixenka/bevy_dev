@@ -85,6 +85,10 @@ fn render(
 }
 
 fn render_element(ctx: &mut EguiContexts, event: &PopupEvent) {
+    let Ok(ctx) = ctx.ctx_mut() else {
+        return;
+    };
+
     let mut area = egui::Area::new(Id::new("popup"));
     area = match event.position {
         PopupPosition::Center => area.anchor(Align2::CENTER_CENTER, egui::Vec2::ZERO),
@@ -93,7 +97,7 @@ fn render_element(ctx: &mut EguiContexts, event: &PopupEvent) {
         }
     };
 
-    area.show(ctx.ctx_mut(), |ui| {
+    area.show(ctx, |ui| {
         let frame = Frame::popup(ui.style());
         frame.show(ui, |ui| (event.add_contents)(ui)).inner
     });
