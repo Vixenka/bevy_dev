@@ -83,7 +83,9 @@ impl Plugin for DebugCameraPlugin {
         let active_spawner = match self.switcher {
             DebugCameraSwitcher::Default => {
                 #[cfg(not(debug_assertions))]
-                bevy::log::warn!("Switcher from bevy_dev's `DebugCamera` is active in release builds. This allows the player to easily activate and manage debug cameras, set the `DebugCameraSpawner` value explicitly in the `DebugCameraPlugin`");
+                bevy::log::warn!(
+                    "Switcher from bevy_dev's `DebugCamera` is active in release builds. This allows the player to easily activate and manage debug cameras, set the `DebugCameraSpawner` value explicitly in the `DebugCameraPlugin`"
+                );
                 true
             }
             DebugCameraSwitcher::Active => true,
@@ -214,6 +216,10 @@ pub struct DebugCamera {
     pub focus: bool,
 }
 
+/// Indicates which debug camera is currently active. Can be used with Single query.
+#[derive(Component)]
+pub struct DebugCameraActive;
+
 impl Default for DebugCamera {
     fn default() -> Self {
         Self {
@@ -277,7 +283,7 @@ fn switcher(
 
     // Spawn new
     if keys.just_pressed(controls.new_debug_camera) {
-        commands.spawn(DebugCamera::default());
+        commands.spawn(global.default_value.clone());
         return;
     }
 
@@ -357,6 +363,7 @@ fn select_next_camera_key_event(
 }
 
 fn spawn_debug_camera_if_any_camera_exist(
+    global: ResMut<DebugCameraGlobalData>,
     mut commands: Commands,
     mut mouse_motion: EventReader<MouseMotion>,
     mut mouse_wheel: EventReader<MouseWheel>,
@@ -364,11 +371,13 @@ fn spawn_debug_camera_if_any_camera_exist(
     #[cfg(feature = "ui")] query: Query<(), (With<Camera>, Without<ui::PreviewCamera>)>,
 ) {
     if query.is_empty() {
-        commands.spawn(DebugCamera::default()).insert(Transform {
-            translation: Vec3::new(0.0, 0.0, -5.0),
-            rotation: Quat::from_rotation_y(180.0f32.to_radians()),
-            ..Default::default()
-        });
+        commands
+            .spawn(global.default_value.clone())
+            .insert(Transform {
+                translation: Vec3::new(0.0, 0.0, -5.0),
+                rotation: Quat::from_rotation_y(180.0f32.to_radians()),
+                ..Default::default()
+            });
     }
 
     // Clear first gained events

@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2025-08-15
+
+### Changed
+
+- Fix UI feature, to not more conflicts with user added bevy_egui.
+- Add `ui::popup` function for faster popups.
+
 ## [0.6.0] - 2025-08-12
 
 ### Changed
@@ -70,7 +77,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Prototype material - simple, metrically correct, PBR compatible and randomly painted mesh for better differentiation of prototype objects.
 
-[unreleased]: https://github.com/Vixenka/bevy_dev/compare/v0.6.0...HEAD
+[unreleased]: https://github.com/Vixenka/bevy_dev/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/Vixenka/bevy_dev/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/Vixenka/bevy_dev/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/Vixenka/bevy_dev/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/Vixenka/bevy_dev/compare/v0.3.1...v0.4.0

@@ -9,18 +9,18 @@ use super::ui::PreviewCamera;
 use crate::ui::popup::{PopupEvent, PopupPosition};
 
 use super::{
-    DebugCamera, DebugCameraData, DebugCameraGlobalData, DebugCameraLastUsedOriginCameraData,
+    DebugCamera, DebugCameraActive, DebugCameraData, DebugCameraGlobalData,
+    DebugCameraLastUsedOriginCameraData,
 };
 
 #[allow(clippy::type_complexity)]
-pub(super) fn run_if_changed(
-    cameras: Query<(), Or<(Added<DebugCamera>, Changed<DebugCamera>)>>,
-) -> bool {
+pub(super) fn run_if_changed(cameras: Query<(), Changed<DebugCamera>>) -> bool {
     !cameras.is_empty()
 }
 
 #[allow(clippy::type_complexity)]
 pub(super) fn system(
+    mut commands: Commands,
     #[cfg(not(feature = "ui"))] mut cameras: Query<(
         Entity,
         &mut Camera,
@@ -46,7 +46,9 @@ pub(super) fn system(
         .filter(|x| x.2.is_some() && x.3.is_some())
         .map(|x| (x.0, x.1, x.2.unwrap(), x.3.unwrap()))
     {
+        let mut commands = commands.get_entity(entity).unwrap();
         if debug_camera.is_changed() && debug_camera.focus {
+            commands.insert(DebugCameraActive);
             is_any_debug_camera_active = true;
 
             // Skip if camera is already active
@@ -81,6 +83,8 @@ pub(super) fn system(
 
             continue;
         } else if debug_camera.focus {
+            commands.remove::<DebugCameraActive>();
+
             // Deactive debug camera
             debug_camera.bypass_change_detection().focus = false;
         }

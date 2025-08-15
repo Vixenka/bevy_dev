@@ -8,11 +8,14 @@ use bevy::{
     },
 };
 use bevy_egui::{
+    EguiUserTextures,
     egui::{self, Color32, Frame, Margin, Stroke, TextureId},
-    EguiContexts,
 };
 
-use crate::ui::popup::{PopupEvent, PopupPosition};
+use crate::ui::{
+    UiContextPass,
+    popup::{PopupEvent, PopupPosition},
+};
 
 use super::{DebugCamera, DebugCameraData, DebugCameraGlobalData};
 
@@ -78,10 +81,8 @@ pub(super) struct DebugCameraPreviewPlugin;
 
 impl Plugin for DebugCameraPreviewPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, spawn_preview_camera).add_systems(
-            Update,
-            (attach_image_to_new_debug_camera, render_to_preview),
-        );
+        app.add_systems(Update, render_to_preview)
+            .add_systems(UiContextPass, attach_image_to_new_debug_camera);
     }
 }
 
@@ -96,7 +97,7 @@ fn attach_image_to_new_debug_camera(
     mut commands: Commands,
     cameras: Query<Entity, Added<DebugCamera>>,
     mut images: ResMut<Assets<Image>>,
-    mut contexts: EguiContexts,
+    mut textures: ResMut<EguiUserTextures>,
 ) {
     for entity in cameras.iter() {
         let mut image = Image {
@@ -129,28 +130,18 @@ fn attach_image_to_new_debug_camera(
 
         commands.entity(entity).insert(DebugCameraPreview {
             image: handle.clone(),
-            texture_id: contexts.add_image(handle),
+            texture_id: textures.add_image(handle),
             last_render_time: 0.0,
         });
     }
 }
 
 #[derive(Debug, Component)]
-pub(super) struct PreviewCamera;
-
-fn spawn_preview_camera(mut commands: Commands) {
-    commands.spawn((
-        Camera3d::default(),
-        Camera {
-            is_active: false,
-            ..Default::default()
-        },
-        PreviewCamera,
-    ));
-}
+pub(crate) struct PreviewCamera;
 
 #[allow(clippy::type_complexity)]
 fn render_to_preview(
+    mut commands: Commands,
     mut preview_camera: Query<
         (&mut Camera, &mut Transform, &mut GlobalTransform),
         With<PreviewCamera>,
@@ -162,14 +153,6 @@ fn render_to_preview(
     global: Res<DebugCameraGlobalData>,
     time: Res<Time>,
 ) {
-    let Ok(mut preview_camera) = preview_camera.single_mut() else {
-        return;
-    };
-    if global.selected_camera.is_none() {
-        preview_camera.0.is_active = false;
-        return;
-    }
-
     let mut debug_camera = match debug_cameras
         .iter_mut()
         .min_by(|x, y| x.0.last_render_time.total_cmp(&y.0.last_render_time))
@@ -177,6 +160,23 @@ fn render_to_preview(
         Some(camera) => camera,
         None => return,
     };
+
+    let Ok(mut preview_camera) = preview_camera.single_mut() else {
+        commands.spawn((
+            Camera3d::default(),
+            Camera {
+                is_active: false,
+                ..Default::default()
+            },
+            PreviewCamera,
+        ));
+        return;
+    };
+
+    if global.selected_camera.is_none() {
+        preview_camera.0.is_active = false;
+        return;
+    }
     debug_camera.0.last_render_time = time.elapsed_secs();
 
     let image_render_target = debug_camera.0.image.clone().into();
